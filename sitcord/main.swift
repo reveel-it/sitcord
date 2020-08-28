@@ -14,15 +14,16 @@ setbuf(__stdoutp, nil);
 func automateDiscord(sit: Bool) -> Bool {
     print("Telling automateDiscord to", sit ? "sit" : "stand")
 
-    let jsLocation = Bundle.main.resourceURL?.appendingPathComponent("./bin/automateDiscord.js")
-    
+    let bundleLocation = Bundle.main.resourceURL?.standardizedFileURL ?? URL.init(fileURLWithPath: ".", isDirectory: true).standardizedFileURL
+    let jsLocation = bundleLocation.appendingPathComponent("automateDiscord.js")
+
     let task = Process()
     let stdoutP = Pipe()
     let stderrP = Pipe()
     task.standardOutput = stdoutP;
     task.standardError = stderrP;
     task.executableURL = URL.init(fileURLWithPath: "/usr/bin/env", isDirectory: false)
-    task.arguments = ["node", jsLocation?.absoluteString ?? "./automateDiscord.js", "--", sit ? "--sit" : "--stand"]
+    task.arguments = ["node", jsLocation.path, sit ? "--sit" : "--stand"]
     task.launch()
     task.waitUntilExit()
 

@@ -36,7 +36,7 @@ func automateDiscord(sit: Bool) -> Bool {
 
     let stderrData = stderrP.fileHandleForReading.readDataToEndOfFile()
     let stderrStr = String.init(data: stderrData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines);
-    print(NSDate(), "node stderr:", stderrStr ?? "Failed to decode automateDiscord.js STDERR to UTF-8", stderr)
+    print(NSDate(), "node stderr:", stderrStr ?? "Failed to decode automateDiscord.js STDERR to UTF-8")
 
     return task.terminationStatus == 0
 }
@@ -52,7 +52,7 @@ class SitcordObserver {
         print(NSDate(), "RECV:", n.name.rawValue)
         let result = automateDiscord(sit: true)
         if !result {
-            print(NSDate(), "Failed to automate discord. Stopping...", stderr)
+            print(NSDate(), "Failed to automate discord. Stopping...")
             exit(1)
         } else {
             sit = true
@@ -63,7 +63,7 @@ class SitcordObserver {
         print(NSDate(),"RECV:", n.name.rawValue)
         let result = automateDiscord(sit: false)
         if !result {
-            print(NSDate(), "Failed to automate discord. Stopping...", stderr)
+            print(NSDate(), "Failed to automate discord. Stopping...")
             exit(1)
         } else {
             sit = false

@@ -15,8 +15,8 @@ Sitcord.app/Contents/document.wflow: Sitcord.app/Contents/document.template.wflo
 	fi)
 
 bin/sitcord: sitcord/main.swift bin/automateDiscord.js node_modules Package.swift
-	swift build
-	cp .build/x86_64-apple-macosx/debug/sitcord ./bin/sitcord
+	swift build -c release
+	cp .build/x86_64-apple-macosx/release/sitcord ./bin/sitcord
 
 node_modules: package-lock.json
 	npm i

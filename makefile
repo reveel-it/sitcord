@@ -4,3 +4,4 @@ bin/sitcord: sitcord/main.swift bin/automateDiscord.js node_modules Package.swif
 
 node_modules: package-lock.json
 	npm i
+	touch node_modules

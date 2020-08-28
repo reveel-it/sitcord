@@ -36,29 +36,43 @@ func automateDiscord(sit: Bool) -> Bool {
 }
 
 class SitcordObserver {
-    var state: String
+    var sit: Bool
 
     init() {
-        state = "awake"
+        sit = true
     }
 
     @objc
     func sleepFn() {
-        state = "asleep"
         let result = automateDiscord(sit: false)
-        print(result)
+        if !result {
+            print("Failed to automate discord. Stopping...")
+            exit(1)
+        } else {
+            sit = false
+        }
     }
 
     @objc
     func wakeFn() {
-        state = "awake"
         let result = automateDiscord(sit: true)
-        print(result)
+        if !result {
+            print("Failed to automate discord. Stopping...")
+            exit(1)
+        }
+        else {
+            sit = true
+        }
     }
 
     @objc
     func status() {
-        print(state)
+        print("Sitcord current state:", sit ? "sit" : "stand")
+        let result = automateDiscord(sit: sit)
+        if !result {
+            print("Failed to automate discord. Stopping...")
+            exit(1)
+        }
     }
 }
 

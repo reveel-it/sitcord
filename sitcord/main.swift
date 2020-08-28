@@ -7,6 +7,7 @@
 //
 import Foundation
 import AppKit
+import Darwin
 
 func automateDiscord(sit: Bool) -> Bool {
     print("Telling automateDiscord to", sit ? "sit" : "stand")
@@ -14,12 +15,23 @@ func automateDiscord(sit: Bool) -> Bool {
     let jsLocation = Bundle.main.resourceURL?.appendingPathComponent("./bin/automateDiscord.js")
     
     let task = Process()
-    let stdout = Pipe()
-    task.standardOutput = stdout;
+    let stdoutP = Pipe()
+    let stderrP = Pipe()
+    task.standardOutput = stdoutP;
+    task.standardError = stderrP;
     task.executableURL = URL.init(fileURLWithPath: "/usr/bin/env", isDirectory: false)
     task.arguments = ["node", jsLocation?.absoluteString ?? "./automateDiscord.js", "--", sit ? "--sit" : "--stand"]
     task.launch()
     task.waitUntilExit()
+
+    let stdoutData = stdoutP.fileHandleForReading.readDataToEndOfFile()
+    let stdoutStr = String.init(data: stdoutData, encoding: String.Encoding.utf8)
+    print(stdoutStr ?? "Failed to decode automateDiscord.js STDOUT to UTF-8")
+
+    let stderrData = stderrP.fileHandleForReading.readDataToEndOfFile()
+    let stderrStr = String.init(data: stderrData, encoding: String.Encoding.utf8)
+    print(stderrStr ?? "Failed to decode automateDiscord.js STDERR to UTF-8", stderr)
+
     return task.terminationStatus == 0
 }
 

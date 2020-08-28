@@ -48,6 +48,7 @@ class SitcordObserver {
 }
 
 func main() {
+    print("Starting...")
     let obs = SitcordObserver()
 
     let workspaceNotifCenter = NSWorkspace.shared.notificationCenter;
@@ -67,7 +68,7 @@ public func registerSigint() -> DispatchSourceSignal {
     signal(SIGINT, SIG_IGN)
     let sigintSrc = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
     sigintSrc.setEventHandler {
-        print("Got SIGINT")
+        print("Stopping...")
         exit(0)
     }
     sigintSrc.resume()

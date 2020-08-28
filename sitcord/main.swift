@@ -31,11 +31,11 @@ func automateDiscord(sit: Bool) -> Bool {
     print(NSDate(), "Finished running task")
 
     let stdoutData = stdoutP.fileHandleForReading.readDataToEndOfFile()
-    let stdoutStr = String.init(data: stdoutData, encoding: String.Encoding.utf8)
+    let stdoutStr = String.init(data: stdoutData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
     print(NSDate(), "node stdout:", stdoutStr ?? "Failed to decode automateDiscord.js STDOUT to UTF-8")
 
     let stderrData = stderrP.fileHandleForReading.readDataToEndOfFile()
-    let stderrStr = String.init(data: stderrData, encoding: String.Encoding.utf8)
+    let stderrStr = String.init(data: stderrData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines);
     print(NSDate(), "node stderr:", stderrStr ?? "Failed to decode automateDiscord.js STDERR to UTF-8", stderr)
 
     return task.terminationStatus == 0

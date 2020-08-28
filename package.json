@@ -1,0 +1,28 @@
+{
+  "name": "sitcord",
+  "version": "1.0.0",
+  "description": "SIT DOWN",
+  "main": "bin/automateDiscord.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reveel-it/sitcord.git"
+  },
+  "keywords": [
+    "SIT",
+    "DOWN"
+  ],
+  "author": "Kyle Brodie, Jonathan Ming",
+  "license": "SEE LICENSE IN LICENSE.MD",
+  "bugs": {
+    "url": "https://github.com/reveel-it/sitcord/issues"
+  },
+  "homepage": "https://github.com/reveel-it/sitcord#readme",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "puppeteer-core": "^5.2.1",
+    "yargs": "^15.4.1"
+  }
+}

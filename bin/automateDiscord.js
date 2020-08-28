@@ -63,21 +63,23 @@ async function stand() {
   });
 }
 
-module.exports = { sit, stand };
-
 async function main() {
-  const { sit, stand } = argv;
-  if (!!sit && !!stand) {
+  if (!!argv.sit && !!argv.stand) {
     throw Error(
       "Don't specify both --sit and --stand at the same time ya dingus!"
     );
   }
-  if (!sit && !stand) {
+  if (!argv.sit && !argv.stand) {
     throw Error("You must supply either --sit or --stand!");
   }
 
-  if (!!sit) await sit();
-  else await stand();
+  if (!!argv.sit) {
+    await sit();
+    console.log("sat");
+  } else {
+    await stand();
+    console.log("stood");
+  }
 }
 
 if (require.main === module) {

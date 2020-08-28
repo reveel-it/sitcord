@@ -1,5 +1,6 @@
 # project ignores
 bin/sitcord
+*.err
 
 # github/gitignore Swift.gitignore
 # Xcode

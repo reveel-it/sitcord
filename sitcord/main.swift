@@ -13,7 +13,7 @@ setbuf(__stdoutp, nil);
 setbuf(__stderrp, nil);
 
 func automateDiscord(sit: Bool) -> Bool {
-    print(NSDate(), "Telling automateDiscord to", sit ? "sit" : "stand")
+    print(NSDate(), sit ? "sit" : "stand", "-> automateDiscord.js")
 
     let bundleLocation = Bundle.main.resourceURL?.standardizedFileURL ?? URL.init(fileURLWithPath: ".", isDirectory: true).standardizedFileURL
     let jsLocation = bundleLocation.appendingPathComponent("automateDiscord.js")
@@ -28,15 +28,18 @@ func automateDiscord(sit: Bool) -> Bool {
     task.launch()
     task.waitUntilExit()
 
-    print(NSDate(), "Finished running task")
-
     let stdoutData = stdoutP.fileHandleForReading.readDataToEndOfFile()
     let stdoutStr = String.init(data: stdoutData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
-    print(NSDate(), "node stdout:", stdoutStr ?? "Failed to decode automateDiscord.js STDOUT to UTF-8")
-
-    let stderrData = stderrP.fileHandleForReading.readDataToEndOfFile()
-    let stderrStr = String.init(data: stderrData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines);
-    print(NSDate(), "node stderr:", stderrStr ?? "Failed to decode automateDiscord.js STDERR to UTF-8")
+    if !(stdoutStr?.isEmpty ?? true) {
+        print(NSDate(), "automateDiscord.js ->", stdoutStr ?? "")
+    }
+    else {
+        let stderrData = stderrP.fileHandleForReading.readDataToEndOfFile()
+        let stderrStr = String.init(data: stderrData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines);
+        if !(stderrStr?.isEmpty ?? true) {
+            print(NSDate(), "automateDiscord.js ->", stdoutStr ?? "")
+        }
+    }
 
     return task.terminationStatus == 0
 }
@@ -49,10 +52,9 @@ class SitcordObserver {
     }
 
     func sit(n: Notification) {
-        print(NSDate(), "RECV:", n.name.rawValue)
         let result = automateDiscord(sit: true)
         if !result {
-            print(NSDate(), "Failed to automate discord. Stopping...")
+            print(NSDate(), "Failed to automate Discord. Stopping...")
             exit(1)
         } else {
             sit = true
@@ -60,10 +62,9 @@ class SitcordObserver {
     }
 
     func stand(n: Notification) {
-        print(NSDate(),"RECV:", n.name.rawValue)
         let result = automateDiscord(sit: false)
         if !result {
-            print(NSDate(), "Failed to automate discord. Stopping...")
+            print(NSDate(), "Failed to automate Discord. Stopping...")
             exit(1)
         } else {
             sit = false
@@ -71,7 +72,7 @@ class SitcordObserver {
     }
 
     func status(t: Timer) {
-        print(NSDate(), "Sitcord current state:", sit ? "sit" : "stand")
+        print(NSDate(), sit ? "sitting" : "standing")
     }
 }
 

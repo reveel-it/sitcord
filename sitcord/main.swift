@@ -49,7 +49,7 @@ class SitcordObserver {
     }
 
     func sit(n: Notification) {
-        print(NSDate(), n.name)
+        print(NSDate(), "RECV:", n.name.rawValue)
         let result = automateDiscord(sit: true)
         if !result {
             print(NSDate(), "Failed to automate discord. Stopping...", stderr)
@@ -60,7 +60,7 @@ class SitcordObserver {
     }
 
     func stand(n: Notification) {
-        print(NSDate(), n.name)
+        print(NSDate(),"RECV:", n.name.rawValue)
         let result = automateDiscord(sit: false)
         if !result {
             print(NSDate(), "Failed to automate discord. Stopping...", stderr)

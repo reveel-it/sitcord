@@ -78,13 +78,9 @@ class SitcordObserver {
 func main() {
     print(NSDate(), "Starting...")
     let obs = SitcordObserver()
-    let workspaceNotifCenter = NSWorkspace.shared.notificationCenter;
     let distribNotifCenter = DistributedNotificationCenter.default()
 
-    workspaceNotifCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: nil, using: obs.sit)
     distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsUnlocked"), object: nil, queue: nil, using: obs.sit)
-
-    workspaceNotifCenter.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: nil, using: obs.stand)
     distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsLocked"), object: nil, queue: nil, using: obs.stand)
     
     // print status to keep app alive

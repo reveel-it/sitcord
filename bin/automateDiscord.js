@@ -34,7 +34,7 @@ async function doInDiscord(fn) {
   try {
     await page.waitForXPath(serverXPath, { timeout: 9000 });
     const [serverBtn] = await page.$x(serverXPath);
-    await serverBtn.click();
+    await serverBtn.evaluate((btn) => btn.click());
     await fn(page);
   } finally {
     browser.disconnect();
@@ -45,7 +45,7 @@ async function sit() {
   await doInDiscord(async (page) => {
     await page.waitForXPath(connectXPath, { timeout: 3000 });
     const [connectBtn] = await page.$x(connectXPath);
-    await connectBtn.click();
+    await connectBtn.evaluate((btn) => btn.click());
   });
 }
 
@@ -54,7 +54,7 @@ async function stand() {
     try {
       await page.waitForXPath(disconnectXPath, { timeout: 3000 });
       const [disconnectBtn] = await page.$x(disconnectXPath);
-      await disconnectBtn.click();
+      await disconnectBtn.evaluate((btn) => btn.click());
     } catch (err) {
       console.warn(
         "Didn't detect the disconnect button, assuming we're already disconnected."

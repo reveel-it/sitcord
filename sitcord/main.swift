@@ -10,11 +10,14 @@ import AppKit
 
 func automateDiscord(sit: Bool) -> Bool {
     print("Telling automateDiscord to", sit ? "sit" : "stand")
+
+    let jsLocation = Bundle.main.resourceURL?.appendingPathComponent("./automateDiscord.js")
+    
     let task = Process()
     let stdout = Pipe()
     task.standardOutput = stdout;
     task.executableURL = URL.init(fileURLWithPath: "/usr/bin/env", isDirectory: false)
-    task.arguments = ["node", "./automateDiscord.js", "--", sit ? "--sit" : "--stand"]
+    task.arguments = ["node", jsLocation?.absoluteString ?? "./automateDiscord.js", "--", sit ? "--sit" : "--stand"]
     task.launch()
     task.waitUntilExit()
     return task.terminationStatus == 0

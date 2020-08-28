@@ -4,13 +4,15 @@ current_dir := $(dir $(mkfile_path))
 
 DISCORD_PATH := /Applications/Discord.app/Contents/MacOS/Discord
 ifdef PTB
-	DISCORD_PATH := /Applications/Discord\ PTB.app/Contents/MacOS/Discord\ PTB
+	DISCORD_PATH := /Applications/Discord\\ PTB.app/Contents/MacOS/Discord\\ PTB
 endif
 
 all: Sitcord.app/Contents/document.wflow bin/sitcord
 
 Sitcord.app/Contents/document.wflow: Sitcord.app/Contents/document.template.wflow
-	sed 's|echo|$(DISCORD_PATH) --remote-debugging-port=54321 \&gt; $(current_dir)bin/discord.log 2\&gt; $(current_dir)bin/discord.err \&amp;\|DISCORD_SERVER_NAME="Focus Dev" DISCORD_DEBUG_PORT=54321 PATH=$(PATH) $(current_dir)bin/sitcord \&gt; $(current_dir)bin/sitcord.log 2\&gt; $(current_dir)bin/sitcord.err \&amp;\||g' Sitcord.app/Contents/document.template.wflow | tr '|' '\n' > Sitcord.app/Contents/document.wflow
+	(if [ -e $(shell echo "$(DISCORD_PATH)" | sed 's|\\|\\|g') ]; then \
+		sed 's|echo|$(DISCORD_PATH) --remote-debugging-port=54321 \&gt; $(current_dir)bin/discord.log 2\&gt; $(current_dir)bin/discord.err \&amp;\|DISCORD_SERVER_NAME="Focus Dev" DISCORD_DEBUG_PORT=54321 PATH=$(PATH) $(current_dir)bin/sitcord \&gt; $(current_dir)bin/sitcord.log 2\&gt; $(current_dir)bin/sitcord.err \&amp;\||g' Sitcord.app/Contents/document.template.wflow | tr '|' '\n' > Sitcord.app/Contents/document.wflow; \
+	fi)
 
 bin/sitcord: sitcord/main.swift bin/automateDiscord.js node_modules Package.swift
 	swift build

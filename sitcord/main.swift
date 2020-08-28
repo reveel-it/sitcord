@@ -9,6 +9,8 @@ import Foundation
 import AppKit
 import Darwin
 
+setbuf(__stdoutp, nil);
+
 func automateDiscord(sit: Bool) -> Bool {
     print("Telling automateDiscord to", sit ? "sit" : "stand")
 

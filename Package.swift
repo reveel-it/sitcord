@@ -4,7 +4,7 @@ import PackageDescription
 let packageName = "sitcord"
 let package = Package(
   name: "sitcord",
-  platforms: [.macOS("15.0")],
+  platforms: [.macOS(.v10_15)],
   products: [
     .library(name: packageName, targets: [packageName])
   ],

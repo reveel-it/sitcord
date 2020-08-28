@@ -1,6 +1,7 @@
 # project ignores
 bin/sitcord
 *.err
+Sitcord.app/Contents/document.wflow
 
 # github/gitignore Swift.gitignore
 # Xcode

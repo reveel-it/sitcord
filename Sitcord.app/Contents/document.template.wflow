@@ -59,9 +59,7 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>/Applications/Discord\ PTB.app/Contents/MacOS/Discord\ PTB --remote-debugging-port=54321 &gt; /tmp/discord.log 2&gt; /tmp/discord.err &amp;
-DISCORD_SERVER_NAME="Focus Dev" DISCORD_DEBUG_PORT=54321 ~/Documents/hackathon/sitcord/bin/sitcord &gt; /tmp/sitcord.log 2&gt; /tmp/sitcord.err &amp;
-</string>
+					<string>echo</string>
 					<key>CheckedForUserDefaultShell</key>
 					<true/>
 					<key>inputMethod</key>

@@ -10,9 +10,10 @@ import AppKit
 import Darwin
 
 setbuf(__stdoutp, nil);
+setbuf(__stderrp, nil);
 
 func automateDiscord(sit: Bool) -> Bool {
-    print("Telling automateDiscord to", sit ? "sit" : "stand")
+    print(NSDate(), "Telling automateDiscord to", sit ? "sit" : "stand")
 
     let bundleLocation = Bundle.main.resourceURL?.standardizedFileURL ?? URL.init(fileURLWithPath: ".", isDirectory: true).standardizedFileURL
     let jsLocation = bundleLocation.appendingPathComponent("automateDiscord.js")
@@ -27,13 +28,15 @@ func automateDiscord(sit: Bool) -> Bool {
     task.launch()
     task.waitUntilExit()
 
+    print(NSDate(), "Finished running task")
+
     let stdoutData = stdoutP.fileHandleForReading.readDataToEndOfFile()
     let stdoutStr = String.init(data: stdoutData, encoding: String.Encoding.utf8)
-    print(stdoutStr ?? "Failed to decode automateDiscord.js STDOUT to UTF-8")
+    print(NSDate(), "node stdout:", stdoutStr ?? "Failed to decode automateDiscord.js STDOUT to UTF-8")
 
     let stderrData = stderrP.fileHandleForReading.readDataToEndOfFile()
     let stderrStr = String.init(data: stderrData, encoding: String.Encoding.utf8)
-    print(stderrStr ?? "Failed to decode automateDiscord.js STDERR to UTF-8", stderr)
+    print(NSDate(), "node stderr:", stderrStr ?? "Failed to decode automateDiscord.js STDERR to UTF-8", stderr)
 
     return task.terminationStatus == 0
 }
@@ -45,54 +48,49 @@ class SitcordObserver {
         sit = true
     }
 
-    @objc
-    func sleepFn() {
+    func sit(n: Notification) {
+        print(NSDate(), n.name)
+        let result = automateDiscord(sit: true)
+        if !result {
+            print(NSDate(), "Failed to automate discord. Stopping...", stderr)
+            exit(1)
+        } else {
+            sit = true
+        }
+    }
+
+    func stand(n: Notification) {
+        print(NSDate(), n.name)
         let result = automateDiscord(sit: false)
         if !result {
-            print("Failed to automate discord. Stopping...")
+            print(NSDate(), "Failed to automate discord. Stopping...", stderr)
             exit(1)
         } else {
             sit = false
         }
     }
 
-    @objc
-    func wakeFn() {
-        let result = automateDiscord(sit: true)
-        if !result {
-            print("Failed to automate discord. Stopping...")
-            exit(1)
-        }
-        else {
-            sit = true
-        }
-    }
-
-    @objc
-    func status() {
-        print("Sitcord current state:", sit ? "sit" : "stand")
-        let result = automateDiscord(sit: sit)
-        if !result {
-            print("Failed to automate discord. Stopping...")
-            exit(1)
-        }
+    func status(t: Timer) {
+        print(NSDate(), "Sitcord current state:", sit ? "sit" : "stand")
     }
 }
 
 func main() {
-    print("Starting...")
+    print(NSDate(), "Starting...")
     let obs = SitcordObserver()
-
     let workspaceNotifCenter = NSWorkspace.shared.notificationCenter;
-    workspaceNotifCenter.addObserver(obs, selector: #selector(SitcordObserver.sleepFn), name: NSWorkspace.willSleepNotification, object: nil)
-    workspaceNotifCenter.addObserver(obs, selector: #selector(SitcordObserver.wakeFn), name: NSWorkspace.didWakeNotification, object: nil)
+    let distribNotifCenter = DistributedNotificationCenter.default()
 
-    let distribNotifCenter = DistributedNotificationCenter.default;
-    distribNotifCenter.addObserver(obs, selector: #selector(SitcordObserver.sleepFn), name: NSNotification.Name("com.apple.screenIsLocked"), object: nil)
-    distribNotifCenter.addObserver(obs, selector: #selector(SitcordObserver.wakeFn), name: NSNotification.Name("com.apple.screenIsUnlocked"), object: nil)
+    workspaceNotifCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: nil, using: obs.sit)
+    workspaceNotifCenter.addObserver(forName: NSWorkspace.screensDidWakeNotification, object: nil, queue: nil, using: obs.sit)
+    distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsUnlocked"), object: nil, queue: nil, using: obs.sit)
+
+    workspaceNotifCenter.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: nil, using: obs.stand)
+    workspaceNotifCenter.addObserver(forName: NSWorkspace.screensDidSleepNotification, object: nil, queue: nil, using: obs.stand)
+    distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsLocked"), object: nil, queue: nil, using: obs.stand)
     
     // print status to keep app alive
-    Timer.scheduledTimer(timeInterval: 60, target: obs, selector: #selector(SitcordObserver.status), userInfo: nil, repeats: true)
+    Timer.scheduledTimer(withTimeInterval: 60, repeats: true, block: obs.status)
     RunLoop.current.run()
 }
 
@@ -100,7 +98,7 @@ public func registerSigint() -> DispatchSourceSignal {
     signal(SIGINT, SIG_IGN)
     let sigintSrc = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
     sigintSrc.setEventHandler {
-        print("Stopping...")
+        print(NSDate(), "SIGINT received. Stopping...")
         exit(0)
     }
     sigintSrc.resume()

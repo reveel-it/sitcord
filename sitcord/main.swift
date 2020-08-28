@@ -11,7 +11,7 @@ import AppKit
 func automateDiscord(sit: Bool) -> Bool {
     print("Telling automateDiscord to", sit ? "sit" : "stand")
 
-    let jsLocation = Bundle.main.resourceURL?.appendingPathComponent("./automateDiscord.js")
+    let jsLocation = Bundle.main.resourceURL?.appendingPathComponent("./bin/automateDiscord.js")
     
     let task = Process()
     let stdout = Pipe()

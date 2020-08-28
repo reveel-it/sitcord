@@ -6,7 +6,6 @@ let package = Package(
   name: "sitcord",
   platforms: [.macOS(.v10_15)],
   products: [
-    .library(name: packageName, targets: [packageName])
   ],
   targets: [
     .target(

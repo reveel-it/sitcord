@@ -47,7 +47,7 @@ async function sit() {
     const [connectBtn] = await page.$x(connectXPath);
     await connectBtn.evaluate((btn) => btn.click());
     // Wait a half-second before clicking again to go to the video pane
-    await page.waitFor("500");
+    await page.waitFor(500);
     await connectBtn.evaluate((btn) => btn.click());
   });
 }

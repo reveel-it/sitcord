@@ -1,16 +1,21 @@
 # Sitcord VERSION TWO 🎸
 
+## Use at your own risk
+
+Using Sitcord requires that you open a debugging port on your Discord app. This port is normally accessible only from localhost, but this still means that using Sitcord will open up the possibility that any other program on your machine could connect to your Discord and both see and control everything. We see this risk as minimal, but still be sure you understand and are willing to accept this risk before continuing!
+
+
 ## Installation
 
 To install and start using Sitcord, make sure you have Discord, Swift (usually via having XCode installed), and Node.js installed.
 Then just run:
 ```bash
-$ make && make install
+$ SERVER="My Discord Server" make && make install
 ```
 
 If you use the Discord PTB instead of the regular Discord macOS app, just prefix the command like so:
 ```bash
-$ PTB=true make && make install
+$ PTB=true SERVER="My Discord Server" make && make install
 ```
 
 And that's it! The installer will put a new app, `Sitcord.app`, into your `~/Applications` directory. When you run this app, it'll launch Discord and the Sitcord daemon at the same time, all hooked up and ready to go.

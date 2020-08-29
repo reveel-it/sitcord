@@ -76,6 +76,22 @@ class SitcordObserver {
     }
 }
 
+func exitIfDiscordExited(pid: String) {
+    let task = Process()
+    let stderrP = Pipe()
+    let stdoutP = Pipe()
+    task.standardError = stderrP;
+    task.standardOutput = stdoutP;
+    task.executableURL = URL.init(fileURLWithPath: "/bin/ps", isDirectory: false)
+    task.arguments = ["-p", pid]
+    task.launch()
+    task.waitUntilExit()
+    if task.terminationStatus != 0 {
+        print(NSDate(), "Discord no longer exists. Stopping...")
+        exit(0)
+    }
+}
+
 func main() {
     print(NSDate(), "Starting...")
     let obs = SitcordObserver()
@@ -84,7 +100,15 @@ func main() {
     distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsUnlocked"), object: nil, queue: nil, using: obs.sit)
     distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsLocked"), object: nil, queue: nil, using: obs.stand)
     
-    // print status to keep app alive
+    if CommandLine.arguments.count < 2 {
+        print(NSDate(), "Sitcord will not exit when Discord exits because Discord's PID wasn't provided as the first command line argument")
+    } else {
+        let pid = CommandLine.arguments[1]
+        print(NSDate(), "Discord PID:", pid)
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true, block: {
+            (t: Timer) -> Void in exitIfDiscordExited(pid: pid)
+        })
+    }
     Timer.scheduledTimer(withTimeInterval: 60, repeats: true, block: obs.status)
     RunLoop.current.run()
 }

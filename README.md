@@ -20,3 +20,5 @@ The default Discord channel that Sitcord will use is "General". If you want to c
 
 **Note about permissions:** You're going to have to re-grant permissions to Sitcord separately, even if you previously granted them to Discord; just a heads-up. Also, Sitcord will ask permission to access whatever folder you've cloned this repo into, so that it can put its log files into the `bin` directory there.
 
+
+This project is the better, more reliable, actually usable successor to https://github.com/jming422/sitcord

@@ -26,10 +26,10 @@ node_modules: package-lock.json
 	npm i
 	touch node_modules
 
-~/Applications/Sitcord.app:
+~/Applications/Sitcord.app: Sitcord.app/Contents/document.wflow
 	cp -r Sitcord.app ~/Applications/Sitcord.app
 
-install: Sitcord.app/Contents/document.wflow ~/Applications/Sitcord.app
+install: ~/Applications/Sitcord.app
 
 clean:
 	rm -f Sitcord.app/Contents/document.wflow

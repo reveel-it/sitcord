@@ -1,4 +1,4 @@
-.PHONY: all
+.PHONY: all clean
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(dir $(mkfile_path))
 
@@ -8,7 +8,7 @@ ifdef PTB
 endif
 
 ifdef CHANNEL_NAME
-	DISCORD_CHANNEL_NAME := "DISCORD_CHANNEL_NAME=$(CHANNEL_NAME)"
+	DISCORD_CHANNEL_NAME := DISCORD_CHANNEL_NAME="$(CHANNEL_NAME)"
 endif
 
 all: Sitcord.app/Contents/document.wflow bin/sitcord
@@ -30,3 +30,6 @@ node_modules: package-lock.json
 	cp -r Sitcord.app ~/Applications/Sitcord.app
 
 install: Sitcord.app/Contents/document.wflow ~/Applications/Sitcord.app
+
+clean:
+	rm -f Sitcord.app/Contents/document.wflow

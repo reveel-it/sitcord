@@ -33,3 +33,6 @@ install: Sitcord.app/Contents/document.wflow ~/Applications/Sitcord.app
 
 clean:
 	rm -f Sitcord.app/Contents/document.wflow
+
+uninstall:
+	rm -rf ~/Applications/Sitcord.app

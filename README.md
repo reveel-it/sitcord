@@ -1,44 +1,29 @@
 # Sitcord VERSION TWO 🎸
 
-You need these environment variables, don't care how you get 'em:
+## Use at your own risk
 
-- DISCORD_DEBUG_PORT
-- DISCORD_SERVER_NAME
+Using Sitcord requires that you open a debugging port on your Discord app. This port is normally accessible only from localhost, but this still means that using Sitcord will open up the possibility that any other program on your machine could connect to your Discord and both see and control everything. We see this risk as minimal, but still be sure you understand and are willing to accept this risk before continuing!
 
-This one is optional and defaults to "General":
 
-- DISCORD_CHANNEL_NAME
+## Installation
 
-## Enabling Discord Debugging
-
-You can use any available port for Discord's debug listener, but whichever one you choose, be sure to set it as `DISCORD_DEBUG_PORT` in your environment.
-
-### macOS
-
-If you installed Discord regularly, you should be able to launch Discord from your terminal and pass in arguments like this:
-
-```
-/Applications/Discord.app/Contents/MacOS/Discord --remote-debugging-port=123123
+To install and start using Sitcord, make sure you have Discord, Swift (usually via having XCode installed), and Node.js installed.
+Then just run:
+```bash
+$ SERVER="My Discord Server" make && make install
 ```
 
-If you use the Discord PTB, the path is only slightly different:
-
-```
-/Applications/Discord\ PTB.app/Contents/MacOS/Discord\ PTB --remote-debugging-port=123123
-```
-
-Now, it isn't super convenient to launch Discord from terminal every time, especially not if you need to leave the terminal running. So, I recommend creating an Automator Application and giving it one action, Run Shell Script, with a line like this:
-
-```
-/Applications/Discord.app/Contents/MacOS/Discord --remote-debugging-port=123123 > /tmp/discord.log 2> /tmp/discord.err &
+If you use the Discord PTB instead of the regular Discord macOS app, just prefix the command like so:
+```bash
+$ PTB=true SERVER="My Discord Server" make && make install
 ```
 
-That will route Discord's logs and errors to files in your `/tmp` directory, which can be convenient, and it'll background the process so your Automator script doesn't have to leave a little spinny gear in your menu bar.
+And that's it! The installer will put a new app, `Sitcord.app`, into your `~/Applications` directory. When you run this app, it'll launch Discord and the Sitcord daemon at the same time, all hooked up and ready to go.
 
-### Windows/Linux
+The default Discord channel that Sitcord will use is "General". If you want to change this; specify `CHANNEL_NAME="My Cool Channel"` before `make`, similar to the PTB argument described above.
 
-Sorry, I haven't gotten around to testing this method on other OSes yet, but since the Discord client is an Electron app pretty much everywhere, the process should be basically the same:
 
-1. Locate the Discord binary on your computer
-1. Figure out how to pass it command line arguments
-1. Give it the `--remote-debugging-port` argument with a port of your choice
+**Note about permissions:** You're going to have to re-grant permissions to Sitcord separately, even if you previously granted them to Discord; just a heads-up. Also, Sitcord will ask permission to access whatever folder you've cloned this repo into, so that it can put its log files into the `bin` directory there.
+
+
+This project is the better, more reliable, actually usable successor to https://github.com/jming422/sitcord

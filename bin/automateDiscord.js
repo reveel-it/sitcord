@@ -28,6 +28,7 @@ async function doInDiscord(fn) {
   const browserWSEndpoint = await getWSEndpoint();
   const browser = await puppeteer.connect({
     browserWSEndpoint,
+    defaultViewport: null,
   });
   const pages = await browser.pages();
   const page = pages[0];

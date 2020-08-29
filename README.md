@@ -18,9 +18,13 @@ If you use the Discord PTB instead of the regular Discord macOS app, just prefix
 $ PTB=true SERVER="My Discord Server" make && make install
 ```
 
-And that's it! The installer will put a new app, `Sitcord.app`, into your `~/Applications` directory. When you run this app, it'll launch Discord and the Sitcord daemon at the same time, all hooked up and ready to go.
+And that's it! The installer will put a new app, `Sitcord.app`, into your `~/Applications` directory. When you run this app, it'll launch Discord and the Sitcord daemon at the same time, all hooked up and ready to go. **Note:** This was a hastily-written hackathon project, so we didn't have the time to properly package everything into Sitcord.app; so **don't delete this repo directory after installing or Sitcord won't work!**
 
-The default Discord channel that Sitcord will use is "General". If you want to change this; specify `CHANNEL_NAME="My Cool Channel"` before `make`, similar to the PTB argument described above.
+
+The default Discord channel that Sitcord will use is "General". If you want to change this; specify `CHANNEL_NAME`:
+```bash
+$ CHANNEL_NAME="My Cool Channel" SERVER="My Discord Server" make && make install
+```
 
 
 **Note about permissions:** You're going to have to re-grant permissions to Sitcord separately, even if you previously granted them to Discord; just a heads-up. Also, Sitcord will ask permission to access whatever folder you've cloned this repo into, so that it can put its log files into the `bin` directory there.

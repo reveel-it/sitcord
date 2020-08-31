@@ -31,3 +31,8 @@ $ CHANNEL_NAME="My Cool Channel" SERVER="My Discord Server" make && make install
 
 
 This project is the better, more reliable, actually usable successor to https://github.com/jming422/sitcord
+
+
+## Troubleshooting
+
+Depending on your XCode vs XCode Command Line tools configuration, you may need to follow the steps described here: https://stackoverflow.com/a/61725799/

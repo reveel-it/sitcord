@@ -1,13 +1,14 @@
 const axios = require("axios").default;
 const puppeteer = require("puppeteer-core");
-const argv = require("yargs").argv;
+const yargs = require("yargs");
+const { hideBin } = require("yargs/helpers");
 
 const DISCORD_DEBUG_PORT = process.env.DISCORD_DEBUG_PORT;
 
 const DISCORD_CHANNEL_NAME = process.env.DISCORD_CHANNEL_NAME || "General";
 const DISCORD_SERVER_NAME = process.env.DISCORD_SERVER_NAME;
 
-const serverXPath = `//a[@aria-label="${DISCORD_SERVER_NAME}"]`;
+const serverXPath = `//div[contains(@aria-label, "Servers")]//div[@role="treeitem" and contains(@aria-label, "${DISCORD_SERVER_NAME}")]`;
 
 const connectXPath = `//div[@role="button" and contains(@aria-label, "${DISCORD_CHANNEL_NAME} (voice channel)")]`;
 const disconnectXPath = '//button[@aria-label="Disconnect"]';
@@ -33,8 +34,9 @@ async function doInDiscord(fn) {
   const pages = await browser.pages();
   const page = pages[0];
   try {
-    await page.waitForXPath(serverXPath, { timeout: 9000 });
-    const [serverBtn] = await page.$x(serverXPath);
+    const serverBtn = await page.waitForXPath(serverXPath, {
+      timeout: 9000,
+    });
     await serverBtn.evaluate((btn) => btn.click());
     await fn(page);
   } finally {
@@ -44,11 +46,12 @@ async function doInDiscord(fn) {
 
 async function sit() {
   await doInDiscord(async (page) => {
-    await page.waitForXPath(connectXPath, { timeout: 3000 });
-    const [connectBtn] = await page.$x(connectXPath);
+    const connectBtn = await page.waitForXPath(connectXPath, {
+      timeout: 3000,
+    });
     await connectBtn.evaluate((btn) => btn.click());
     // Wait a half-second before clicking again to go to the video pane
-    await page.waitFor(500);
+    await page.waitForTimeout(500);
     await connectBtn.evaluate((btn) => btn.click());
   });
 }
@@ -56,8 +59,10 @@ async function sit() {
 async function stand() {
   await doInDiscord(async (page) => {
     try {
-      await page.waitForXPath(disconnectXPath, { timeout: 3000 });
-      const [disconnectBtn] = await page.$x(disconnectXPath);
+      const disconnectBtn = await page.waitForXPath(disconnectXPath, {
+        timeout: 3000,
+      });
+
       await disconnectBtn.evaluate((btn) => btn.click());
     } catch (err) {
       console.warn(
@@ -68,16 +73,18 @@ async function stand() {
 }
 
 async function main() {
-  if (!!argv.sit && !!argv.stand) {
+  const args = yargs(hideBin(process.argv)).argv;
+
+  if (!!args.sit && !!args.stand) {
     throw Error(
       "Don't specify both --sit and --stand at the same time ya dingus!"
     );
   }
-  if (!argv.sit && !argv.stand) {
+  if (!args.sit && !args.stand) {
     throw Error("You must supply either --sit or --stand!");
   }
 
-  if (!!argv.sit) {
+  if (!!args.sit) {
     await sit();
     console.log("sat");
   } else {

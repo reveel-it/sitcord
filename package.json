@@ -1,6 +1,6 @@
 {
   "name": "sitcord",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "main": "bin/automateDiscord.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,8 +16,8 @@
   },
   "homepage": "https://github.com/reveel-it/sitcord#readme",
   "dependencies": {
-    "axios": "^0.20.0",
-    "puppeteer-core": "^5.2.1",
-    "yargs": "^15.4.1"
+    "axios": "^0.21.0",
+    "puppeteer-core": "^5.4.1",
+    "yargs": "^16.1.0"
   }
 }

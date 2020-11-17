@@ -10,7 +10,7 @@ const DISCORD_SERVER_NAME = process.env.DISCORD_SERVER_NAME;
 
 const serverXPath = `//div[contains(@aria-label, "Servers")]//div[@role="treeitem" and contains(@aria-label, "${DISCORD_SERVER_NAME}")]`;
 
-const connectXPath = `//div[@role="button" and contains(@aria-label, "${DISCORD_CHANNEL_NAME} (voice channel)")]`;
+const connectXPath = `//*[@role="button" and contains(@aria-label, "${DISCORD_CHANNEL_NAME} (voice channel)")]`;
 const disconnectXPath = '//button[@aria-label="Disconnect"]';
 
 async function getWSEndpoint() {

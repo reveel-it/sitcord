@@ -17,7 +17,7 @@
   "homepage": "https://github.com/reveel-it/sitcord#readme",
   "dependencies": {
     "axios": "^0.21.1",
-    "puppeteer-core": "^5.4.1",
-    "yargs": "^16.1.0"
+    "puppeteer-core": "^10.0.0",
+    "yargs": "^17.0.1"
   }
 }

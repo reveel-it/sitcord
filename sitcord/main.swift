@@ -2,8 +2,8 @@
 //  main.swift
 //  sitcord
 //
-//  Created by Kyle Brodie, Jonathan Ming on 2020-08-28.
-//  Copyright © 2020 Reveel, LLC. All rights reserved.
+//  Created by Kyle Brodie, Arte Ebrahimi, Jonathan Ming
+//  Copyright © 2021 Reveel, LLC. All rights reserved.
 //
 import Foundation
 import AppKit
@@ -12,8 +12,8 @@ import Darwin
 setbuf(__stdoutp, nil);
 setbuf(__stderrp, nil);
 
-func automateDiscord(sit: Bool) -> Bool {
-    print(NSDate(), sit ? "sit" : "stand", "-> automateDiscord.js")
+func automateDiscord(server: String, sit: Bool) -> Bool {
+    print(NSDate(), sit ? "sit" : "stand", "-> automateDiscord")
 
     let bundleLocation = Bundle.main.resourceURL?.standardizedFileURL ?? URL.init(fileURLWithPath: ".", isDirectory: true).standardizedFileURL
     let jsLocation = bundleLocation.appendingPathComponent("automateDiscord.js")
@@ -24,7 +24,7 @@ func automateDiscord(sit: Bool) -> Bool {
     task.standardOutput = stdoutP;
     task.standardError = stderrP;
     task.executableURL = URL.init(fileURLWithPath: "/usr/bin/env", isDirectory: false)
-    task.arguments = ["node", jsLocation.path, sit ? "--sit" : "--stand"]
+    task.arguments = ["node", jsLocation.path, sit ? "--sit" : "--stand", "--port=54321", "--server='\(server)'"]
     task.launch()
     task.waitUntilExit()
 
@@ -46,9 +46,11 @@ func automateDiscord(sit: Bool) -> Bool {
 
 class SitcordObserver {
     var sit: Bool
+    var server: String
 
-    init() {
+    init(iServer: String) {
         sit = true
+        server = iServer
     }
 
     func sit(n: Notification) {
@@ -76,40 +78,44 @@ class SitcordObserver {
     }
 }
 
-func exitIfDiscordExited(pid: String) {
-    let task = Process()
-    let stderrP = Pipe()
-    let stdoutP = Pipe()
-    task.standardError = stderrP;
-    task.standardOutput = stdoutP;
-    task.executableURL = URL.init(fileURLWithPath: "/bin/ps", isDirectory: false)
-    task.arguments = ["-p", pid]
-    task.launch()
-    task.waitUntilExit()
-    if task.terminationStatus != 0 {
-        print(NSDate(), "Discord no longer exists. Stopping...")
-        exit(0)
+class DiscordTerminatedObserver: NSObject {
+    @objc var objectToObserve: NSRunningApplication
+    var observation: NSKeyValueObservation?
+
+    init(object: NSRunningApplication) {
+        objectToObserve = object
+        super.init()
+
+        observation = observe(
+            \.objectToObserve.isTerminated,
+            options: [.initial, .new]
+        ) { object, change in
+            print(NSDate(), "Discord isTerminated changed to: \(change.newValue!)")
+            if change.newValue == true {
+                print(NSDate(), "Discord terminated. Stopping...")
+                exit(0)
+            }
+        }
     }
 }
 
 func main() {
     print(NSDate(), "Starting...")
-    let obs = SitcordObserver()
+
+    guard let discordUrl = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.hnc.Discord") else {
+        print(NSDate(), "Can't locate Discord app; is it installed?")
+        return
+    }
+
+    let discord = NSWorkspace.shared.openApplication(at: discordUrl, configuration: NSWorkspace.OpenConfiguration(arguments: ["--remote-debugging-port=54321"]))
+    let discordTermObs = DiscordTerminatedObserver(object: discord)
+
+    let obs = SitcordObserver("Focus Dev")
     let distribNotifCenter = DistributedNotificationCenter.default()
 
     distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsUnlocked"), object: nil, queue: nil, using: obs.sit)
     distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsLocked"), object: nil, queue: nil, using: obs.stand)
     
-    if CommandLine.arguments.count < 2 {
-        print(NSDate(), "Sitcord will not exit when Discord exits because Discord's PID wasn't provided as the first command line argument")
-    } else {
-        let pid = CommandLine.arguments[1]
-        print(NSDate(), "Discord PID:", pid)
-        Timer.scheduledTimer(withTimeInterval: 5, repeats: true, block: {
-            (t: Timer) -> Void in exitIfDiscordExited(pid: pid)
-        })
-    }
-    Timer.scheduledTimer(withTimeInterval: 60, repeats: true, block: obs.status)
     RunLoop.current.run()
 }
 

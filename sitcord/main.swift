@@ -1,47 +1,59 @@
-//
 //  main.swift
 //  sitcord
 //
 //  Created by Kyle Brodie, Arte Ebrahimi, Jonathan Ming
 //  Copyright © 2021 Reveel, LLC. All rights reserved.
 //
-import Foundation
 import AppKit
 import Darwin
+import Foundation
 
-setbuf(__stdoutp, nil);
-setbuf(__stderrp, nil);
+setbuf(__stdoutp, nil)
+setbuf(__stderrp, nil)
 
 func automateDiscord(server: String, sit: Bool) -> Bool {
     print(NSDate(), sit ? "sit" : "stand", "-> automateDiscord")
 
-    let bundleLocation = Bundle.main.resourceURL?.standardizedFileURL ?? URL.init(fileURLWithPath: ".", isDirectory: true).standardizedFileURL
+    let bundleLocation = Bundle.main.resourceURL?.standardizedFileURL ?? URL(fileURLWithPath: ".", isDirectory: true).standardizedFileURL
     let jsLocation = bundleLocation.appendingPathComponent("automateDiscord.js")
 
     let task = Process()
     let stdoutP = Pipe()
     let stderrP = Pipe()
-    task.standardOutput = stdoutP;
-    task.standardError = stderrP;
-    task.executableURL = URL.init(fileURLWithPath: "/usr/bin/env", isDirectory: false)
+    task.standardOutput = stdoutP
+    task.standardError = stderrP
+    task.executableURL = URL(fileURLWithPath: "/usr/bin/env", isDirectory: false)
     task.arguments = ["node", jsLocation.path, sit ? "--sit" : "--stand", "--port=54321", "--server='\(server)'"]
     task.launch()
     task.waitUntilExit()
 
     let stdoutData = stdoutP.fileHandleForReading.readDataToEndOfFile()
-    let stdoutStr = String.init(data: stdoutData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+    let stdoutStr = String(data: stdoutData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
     if !(stdoutStr?.isEmpty ?? true) {
         print(NSDate(), "automateDiscord.js ->", stdoutStr ?? "")
-    }
-    else {
+    } else {
         let stderrData = stderrP.fileHandleForReading.readDataToEndOfFile()
-        let stderrStr = String.init(data: stderrData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines);
+        let stderrStr = String(data: stderrData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
         if !(stderrStr?.isEmpty ?? true) {
             print(NSDate(), "automateDiscord.js ->", stdoutStr ?? "")
         }
     }
 
     return task.terminationStatus == 0
+}
+
+func executeAppleScript(script: String) -> Bool {
+    var error: NSDictionary?
+    if let scriptObject = NSAppleScript(source: script) {
+        if scriptObject.executeAndReturnError(&error).stringValue != nil {
+            return true
+        } else if error != nil {
+            print("error: ", error!)
+            return false
+        }
+    }
+
+    return false
 }
 
 class SitcordObserver {
@@ -53,8 +65,24 @@ class SitcordObserver {
         server = iServer
     }
 
-    func sit(n: Notification) {
-        let result = automateDiscord(sit: true)
+    func sit(n _: Notification) {
+        // let result = executeAppleScript(script: """
+        // tell application "System Events" to tell process "Discord"
+        //     keystroke "k" using {command down}
+        //     delay 0.2
+        //     keystroke "*"
+        //     delay 0.5
+        //     key code 36
+        //     delay 0.3
+
+        //     keystroke "k" using {command down}
+        //     delay 0.1
+        //     keystroke "!g"
+        //     delay 0.1
+        //     key code 36
+        // end tell
+        // """)
+        let result = automateDiscord(server: server, sit: true)
         if !result {
             print(NSDate(), "Failed to automate Discord. Stopping...")
             exit(1)
@@ -63,8 +91,23 @@ class SitcordObserver {
         }
     }
 
-    func stand(n: Notification) {
-        let result = automateDiscord(sit: false)
+    func stand(n _: Notification) {
+        // let result = executeAppleScript(script: """
+        // tell application "System Events" to tell process "Discord"
+        //     keystroke "k" using {command down}
+        //     delay 0.2
+        //     keystroke "@sitcord-do-not-friend-me"
+        //     delay 0.2
+        //     key code 36
+        //     delay 0.2
+
+        //     keystroke "'" using {control down}
+        //     delay 0.5
+
+        //     keystroke "m" using {command down, shift down}
+        // end tell
+        // """)
+        let result = automateDiscord(server: server, sit: false)
         if !result {
             print(NSDate(), "Failed to automate Discord. Stopping...")
             exit(1)
@@ -73,7 +116,7 @@ class SitcordObserver {
         }
     }
 
-    func status(t: Timer) {
+    func status(t _: Timer) {
         print(NSDate(), sit ? "sitting" : "standing")
     }
 }
@@ -89,7 +132,7 @@ class DiscordTerminatedObserver: NSObject {
         observation = observe(
             \.objectToObserve.isTerminated,
             options: [.initial, .new]
-        ) { object, change in
+        ) { _, change in
             print(NSDate(), "Discord isTerminated changed to: \(change.newValue!)")
             if change.newValue == true {
                 print(NSDate(), "Discord terminated. Stopping...")
@@ -107,15 +150,22 @@ func main() {
         return
     }
 
-    let discord = NSWorkspace.shared.openApplication(at: discordUrl, configuration: NSWorkspace.OpenConfiguration(arguments: ["--remote-debugging-port=54321"]))
-    let discordTermObs = DiscordTerminatedObserver(object: discord)
+    let config = NSWorkspace.OpenConfiguration()
+    config.arguments = ["--remote-debugging-port=54321"]
 
-    let obs = SitcordObserver("Focus Dev")
+    var discord: NSRunningApplication?
+
+    NSWorkspace.shared.openApplication(at: discordUrl, configuration: config) { runningApp, _ -> Void in
+        discord = runningApp
+        DiscordTerminatedObserver(object: runningApp!)
+    }
+
+    let obs = SitcordObserver(iServer: "Focus Dev")
     let distribNotifCenter = DistributedNotificationCenter.default()
 
     distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsUnlocked"), object: nil, queue: nil, using: obs.sit)
     distribNotifCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsLocked"), object: nil, queue: nil, using: obs.stand)
-    
+
     RunLoop.current.run()
 }
 

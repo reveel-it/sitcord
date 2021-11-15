@@ -12,6 +12,7 @@ setbuf(__stdoutp, nil)
 setbuf(__stderrp, nil)
 
 func automateDiscord(server: String, sit: Bool) -> Bool {
+    NSLog("Automate Discord %", sit ? "sit" : "stand")
     print(NSDate(), sit ? "sit" : "stand", "-> automateDiscord")
 
     let bundleLocation = Bundle.main.resourceURL?.standardizedFileURL ?? URL(fileURLWithPath: ".", isDirectory: true).standardizedFileURL
@@ -24,6 +25,8 @@ func automateDiscord(server: String, sit: Bool) -> Bool {
     task.standardError = stderrP
     task.executableURL = URL(fileURLWithPath: "/usr/bin/env", isDirectory: false)
     task.arguments = ["node", jsLocation.path, sit ? "--sit" : "--stand", "--port=54321", "--server='\(server)'"]
+    // task.launchPath = "/bin/zsh"
+    // task.arguments = ["-c", "node \(jsLocation.path) \(sit ? "--sit" : "--stand") --port 54321 --server '\(server)'"]
     task.launch()
     task.waitUntilExit()
 
@@ -34,6 +37,8 @@ func automateDiscord(server: String, sit: Bool) -> Bool {
     } else {
         let stderrData = stderrP.fileHandleForReading.readDataToEndOfFile()
         let stderrStr = String(data: stderrData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        NSLog("ERROR: %", stderrStr ?? "")
+        NSLog(stderrStr!)
         if !(stderrStr?.isEmpty ?? true) {
             print(NSDate(), "automateDiscord.js ->", stdoutStr ?? "")
         }

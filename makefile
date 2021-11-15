@@ -33,6 +33,21 @@ install: ~/Applications/Sitcord.app
 
 clean:
 	rm -f Sitcord.app/Contents/document.wflow
+	rm -f Sitcord.app/Contents/MacOS/sitcord
+	rm -f Sitcord.app/Contents/Resources/automateDiscord.js
+	rm -rf Sitcord.app/Contents/Resources/node_modules
+	rm -rf .build_arm64
+	rm -rf .build_x86_64
+	rm -f out/sitcord
+
+build: clean
+	npm i
+	swift build -c release --arch arm64 --build-path .build_arm64
+	swift build -c release --arch x86_64 --build-path .build_x86_64
+	lipo -create -output out/sitcord .build_arm64/release/sitcord .build_x86_64/release/sitcord
+	cp -r node_modules Sitcord.app/Contents/Resources/node_modules
+	cp out/sitcord Sitcord.app/Contents/MacOS/sitcord
+	cp bin/automateDiscord.js Sitcord.app/Contents/Resources/automateDiscord.js
 
 uninstall:
 	rm -rf ~/Applications/Sitcord.app

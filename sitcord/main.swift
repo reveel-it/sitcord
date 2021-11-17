@@ -23,10 +23,10 @@ func automateDiscord(server: String, sit: Bool) -> Bool {
     let stderrP = Pipe()
     task.standardOutput = stdoutP
     task.standardError = stderrP
-    task.executableURL = URL(fileURLWithPath: "/usr/bin/env", isDirectory: false)
-    task.arguments = ["node", jsLocation.path, sit ? "--sit" : "--stand", "--port=54321", "--server='\(server)'"]
-    // task.launchPath = "/bin/zsh"
-    // task.arguments = ["-c", "node \(jsLocation.path) \(sit ? "--sit" : "--stand") --port 54321 --server '\(server)'"]
+    // task.executableURL = URL(fileURLWithPath: "/usr/bin/env", isDirectory: false)
+    // task.arguments = ["node", jsLocation.path, sit ? "--sit" : "--stand", "--port=54321", "--server='\(server)'"]
+    task.launchPath = "/bin/zsh"
+    task.arguments = ["--login", "-c", "$(brew --prefix node)/bin/node \(jsLocation.path) \(sit ? "--sit" : "--stand") --port 54321 --server '\(server)'"]
     task.launch()
     task.waitUntilExit()
 
@@ -37,7 +37,6 @@ func automateDiscord(server: String, sit: Bool) -> Bool {
     } else {
         let stderrData = stderrP.fileHandleForReading.readDataToEndOfFile()
         let stderrStr = String(data: stderrData, encoding: String.Encoding.utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
-        NSLog("ERROR: %", stderrStr ?? "")
         NSLog(stderrStr!)
         if !(stderrStr?.isEmpty ?? true) {
             print(NSDate(), "automateDiscord.js ->", stdoutStr ?? "")

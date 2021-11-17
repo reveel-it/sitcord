@@ -44,6 +44,7 @@ build: clean
 	npm i
 	swift build -c release --arch arm64 --build-path .build_arm64
 	swift build -c release --arch x86_64 --build-path .build_x86_64
+	mkdir -p out
 	lipo -create -output out/sitcord .build_arm64/release/sitcord .build_x86_64/release/sitcord
 	cp -r node_modules Sitcord.app/Contents/Resources/node_modules
 	cp out/sitcord Sitcord.app/Contents/MacOS/sitcord
